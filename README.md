@@ -1,6 +1,6 @@
 # DESCEndLib <img src="./DESCendLibLogo.png" align="center" width="50">
 
-DESCEndLib (DESrv Controlled End Library) is logger, thread manager, localizer and config provider in one library. Originally created for DESrv.
+DESCEndLib (DESrv "Control End Library") is logger, thread manager, localizer and config provider in one library. Originally created for DESrv.
 
 ## About this
 
