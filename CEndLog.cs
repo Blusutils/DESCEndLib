@@ -12,6 +12,9 @@
         Critical,
         Fatal
     }
+    public class FileLogRotator : ICronable {
+
+    }
     /// <summary>
     /// <see cref="CEnd"/> File logger
     /// </summary>
@@ -42,7 +45,7 @@
             using StreamWriter file = new(TargetDir + "\\" + String.Format(LogNameSchema, "DESCendLog", $"{DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}") + ".log", append: true);
             file.WriteLine(message);
         }
-        // separate different runs of programm by new line
+        // separate different runs of program by new line
         ~FileLogger() {
             using StreamWriter file = new(TargetDir + "\\" + String.Format(LogNameSchema, "DESCendLog", $"{DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}") + ".log", append: true);
             file.WriteLine("\r\n\r\n");
@@ -55,7 +58,7 @@
         /// <summary>
         /// Is logs sends to console stdout?
         /// </summary>
-        public bool ConsoleLogging = false;
+        public bool ConsoleLogging = true;
         /// <summary>
         /// File logger
         /// </summary>
