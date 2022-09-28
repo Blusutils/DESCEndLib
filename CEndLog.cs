@@ -1,4 +1,6 @@
-﻿namespace DESCEnd.Logging {
+﻿using DESCEnd.TextUtils;
+
+namespace DESCEnd.Logging {
     /// <summary>
     /// Logging levels enumeration
     /// </summary>
@@ -21,31 +23,40 @@
         /// </summary>
         public string TargetDir = Path.Combine(".", "logs");
         /// <summary>
-        /// Logging pattern (useless, because <see cref="String.Format(string, object?[])"/> is not as flexible as i wish)
+        /// Logging pattern
         /// </summary>
-        [Obsolete]
-        public string LogNameSchema = "{0}-{1}";
+        public string LogNameSchema = "DESCEndLog-{Date}";
         /// <summary>
         /// Where logger got log
         /// </summary>
         public string LogSource = null;
+
+        StreamWriter logFile;
+        // todo
+        Dictionary<string, object> formats = new Dictionary<string, object> {
+            ["Date"] = $"{DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}"
+        };
         /// <summary>
         /// Send log to the logger
         /// </summary>
         /// <param name="message">Message to send</param>
         /// <param name="source">Log source</param>
-        public void Log(string message, string source = null) {
+        public void Log(string message) {
             if (!Directory.Exists(TargetDir)) {
                 Console.Error.WriteLine("Log directory not found, creating default");
                 Directory.CreateDirectory(TargetDir);
             };
-            using StreamWriter file = new(TargetDir + "\\" + String.Format(LogNameSchema, "DESCendLog", $"{DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}") + ".log", append: true);
-            file.WriteLine(message);
+            if (logFile == null) {
+                logFile = new(Path.Combine(TargetDir,TextUtils.AdvFormat.Format(LogNameSchema, formats) + ".log"), append: true);
+            }
+            logFile.WriteLine(message);
+            logFile.Flush();
         }
         // separate different runs of programm by new line
         ~FileLogger() {
-            using StreamWriter file = new(TargetDir + "\\" + String.Format(LogNameSchema, "DESCendLog", $"{DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}") + ".log", append: true);
-            file.WriteLine("\r\n\r\n");
+            logFile.WriteLine("\r\n\r\n");
+            logFile.Close();
+            logFile = null;
         }
     }
     /// <summary>
@@ -55,23 +66,27 @@
         /// <summary>
         /// Is logs sends to console stdout?
         /// </summary>
-        public bool ConsoleLogging = false;
+        public bool ConsoleLogging { get; set; } = false;
         /// <summary>
         /// File logger
         /// </summary>
-        public FileLogger? FileLogging = null;
+        public FileLogger? FileLogging { get; set; } = null;
         /// <summary>
         /// Logging level filter (console stdout)
         /// </summary>
-        public LogLevel ConsoleLoggingLevel = LogLevel.Debug;
+        public LogLevel ConsoleLoggingLevel { get; set; } = LogLevel.Debug;
         /// <summary>
         /// Logging level filter (file logger)
         /// </summary>
-        public LogLevel FileLoggingLevel = LogLevel.Debug;
+        public LogLevel FileLoggingLevel { get; set; } = LogLevel.Debug;
         /// <summary>
         /// Default logs source
         /// </summary>
-        public string LogSource = "CEnd";
+        public string LogSource { get; set; } = "DESCEnd";
+        /// <summary>
+        /// Schema of log messages
+        /// </summary>
+        public string LogMessageSchema { get; set; } = "[{Source} | {Date} | {Level}] {Message}";
 
         /// <summary>
         /// Delegate for log events
@@ -111,17 +126,23 @@
         /// <param name="level">Log level</param>
         /// <param name="source">Log source</param>
         /// <param name="format">Formattion for <see cref="Console.WriteLine(string, object?[]?)"/> and <see cref="FileLogger"/></param>
-        public void Log(string message, LogLevel level, string source = "DES CEnd", params object[] format) {
+        public void Log(string message, LogLevel level, string source = null, params object[] format) {
             source = source ?? LogSource;
-            if (OnLog != null) OnLog(level, message, source, format);
-            var msg = $"[{source} | {DateTime.Now} | {level.ToString().ToUpper()}] {message}";
+            OnLog?.Invoke(level, message, source, format);
+            var formatForConsole = new Dictionary<string, object> {
+                ["Source"] = source,
+                ["Date"] = DateTime.Now,
+                ["Level"] = level.ToString().ToUpper(),
+                ["Message"] = message
+            };
+            var msg = LogMessageSchema.Format(formatForConsole);
             if (ConsoleLogging && level >= ConsoleLoggingLevel) {
                 Console.ForegroundColor = GetConsoleColor(level);
                 Console.WriteLine(msg, format);
                 Console.ResetColor();
             };
             if (FileLogging != null && level >= FileLoggingLevel)
-                FileLogging.Log(msg, source);
+                FileLogging.Log(msg);
         }
         /// <summary>
         /// Send Debug log to console stdout (if enabled) and file logger (if exists). Simular to: <see cref="Log(string, LogLevel, string, object[])"/> where <see cref="LogLevel"/> is <see cref="LogLevel.Debug"/>
