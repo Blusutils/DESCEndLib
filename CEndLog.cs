@@ -86,7 +86,7 @@ namespace DESCEnd.Logging {
         /// <summary>
         /// Schema of log messages
         /// </summary>
-        public string LogMessageSchema { get; set; } = "[{Source} | {Date} | {Level}] {Message}";
+        public string LogMessageSchema { get; set; } = "[{Date} | {Level} | {Source}/{SourceThread}] {Message}";
 
         /// <summary>
         /// Delegate for log events
@@ -129,10 +129,12 @@ namespace DESCEnd.Logging {
         public void Log(string message, LogLevel level, string source = null, params object[] format) {
             source = source ?? LogSource;
             OnLog?.Invoke(level, message, source, format);
+            var lvlString = level.ToString().ToUpper();
             var formatForConsole = new Dictionary<string, object> {
                 ["Source"] = source,
+                ["SourceThread"] = Thread.CurrentThread.Name,
                 ["Date"] = DateTime.Now,
-                ["Level"] = level.ToString().ToUpper(),
+                ["Level"] = lvlString + Enumerable.Repeat(" ", 8-lvlString.Length),
                 ["Message"] = message
             };
             var msg = LogMessageSchema.Format(formatForConsole);
