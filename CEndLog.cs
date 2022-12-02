@@ -133,7 +133,7 @@ namespace DESCEnd.Logging {
                 ["Source"] = source??"Null",
                 ["SourceThread"] = Thread.CurrentThread.Name??"Null",
                 ["Date"] = DateTime.Now,
-                ["Level"] = lvlString + Enumerable.Repeat(" ", 8-lvlString.Length),
+                ["Level"] = lvlString + string.Join("", Enumerable.Repeat(" ", 8-lvlString.Length)),
                 ["Message"] = message??"*message isn't provided*"
             };
             var msg = LogMessageSchema.Format(formatForConsole);
