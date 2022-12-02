@@ -95,7 +95,7 @@ namespace DESCEnd.Logging {
         /// <param name="message">Message</param>
         /// <param name="source">Source of log - where logger got log</param>
         /// <param name="format">Additional params for formattion</param>
-        public delegate void OnLogDelegate(LogLevel level, string message, string source, object[] format);
+        public delegate void OnLogDelegate(LogLevel level, string message, string source);
         /// <summary>
         /// Event triggered when the log is received
         /// </summary>
@@ -125,10 +125,9 @@ namespace DESCEnd.Logging {
         /// <param name="message">Message to send</param>
         /// <param name="level">Log level</param>
         /// <param name="source">Log source</param>
-        /// <param name="format">Formattion for <see cref="Console.WriteLine(string, object?[]?)"/> and <see cref="FileLogger"/></param>
-        public void Log(string message, LogLevel level, string source = null, params object[] format) {
+        public void Log(string message, LogLevel level, string source = null) {
             source = source ?? LogSource;
-            OnLog?.Invoke(level, message, source, format);
+            OnLog?.Invoke(level, message, source);
             var lvlString = level.ToString().ToUpper();
             var formatForConsole = new Dictionary<string, object> {
                 ["Source"] = source,
@@ -140,7 +139,7 @@ namespace DESCEnd.Logging {
             var msg = LogMessageSchema.Format(formatForConsole);
             if (ConsoleLogging && level >= ConsoleLoggingLevel) {
                 Console.ForegroundColor = GetConsoleColor(level);
-                Console.WriteLine(msg, format);
+                Console.WriteLine(msg);
                 Console.ResetColor();
             };
             if (FileLogging != null && level >= FileLoggingLevel)
@@ -151,72 +150,64 @@ namespace DESCEnd.Logging {
         /// </summary>
         /// <param name="message">Message to send</param>
         /// <param name="source">Log source</param>
-        /// <param name="format">Formattion</param>
-        public void Debug(string message, string source = null, params object[] format) {
-            Log(message, LogLevel.Debug, source ?? LogSource, format);
+        public void Debug(string message, string source = null) {
+            Log(message, LogLevel.Debug, source ?? LogSource);
         }
         /// <summary>
         /// Send Notice log to console stdout (if enabled) and file logger (if exists). Simular to: <see cref="Log(string, LogLevel, string, object[])"/> where <see cref="LogLevel"/> is <see cref="LogLevel.Notice"/>
         /// </summary>
         /// <param name="message">Message to send</param>
         /// <param name="source">Log source</param>
-        /// <param name="format">Formattion</param>
-        public void Notice(string message, string source = null, params object[] format) {
-            Log(message, LogLevel.Notice, source ?? LogSource, format);
+        public void Notice(string message, string source = null) {
+            Log(message, LogLevel.Notice, source ?? LogSource);
         }
         /// <summary>
         /// Send Info log to console stdout (if enabled) and file logger (if exists). Simular to: <see cref="Log(string, LogLevel, string, object[])"/> where <see cref="LogLevel"/> is <see cref="LogLevel.Info"/>
         /// </summary>
         /// <param name="message">Message to send</param>
         /// <param name="source">Log source</param>
-        /// <param name="format">Formattion</param>
-        public void Info(string message, string source = null, params object[] format) {
-            Log(message, LogLevel.Info, source ?? LogSource, format);
+        public void Info(string message, string source = null) {
+            Log(message, LogLevel.Info, source ?? LogSource);
         }
         /// <summary>
         /// Send Sucess log to console stdout (if enabled) and file logger (if exists). Simular to: <see cref="Log(string, LogLevel, string, object[])"/> where <see cref="LogLevel"/> is <see cref="LogLevel.Success"/>
         /// </summary>
         /// <param name="message">Message to send</param>
         /// <param name="source">Log source</param>
-        /// <param name="format">Formattion</param>
-        public void Success(string message, string source = null, params object[] format) {
-            Log(message, LogLevel.Success, source ?? LogSource, format);
+        public void Success(string message, string source = null) {
+            Log(message, LogLevel.Success, source ?? LogSource);
         }
         /// <summary>
         /// Send Warn log to console stdout (if enabled) and file logger (if exists). Simular to: <see cref="Log(string, LogLevel, string, object[])"/> where <see cref="LogLevel"/> is <see cref="LogLevel.Warn"/>
         /// </summary>
         /// <param name="message">Message to send</param>
         /// <param name="source">Log source</param>
-        /// <param name="format">Formattion</param>
-        public void Warn(string message, string source = null, params object[] format) {
-            Log(message, LogLevel.Warn, source ?? LogSource, format);
+        public void Warn(string message, string source = null) {
+            Log(message, LogLevel.Warn, source ?? LogSource);
         }
         /// <summary>
         /// Send Error log to console stdout (if enabled) and file logger (if exists). Simular to: <see cref="Log(string, LogLevel, string, object[])"/> where <see cref="LogLevel"/> is <see cref="LogLevel.Error"/>
         /// </summary>
         /// <param name="message">Message to send</param>
         /// <param name="source">Log source</param>
-        /// <param name="format">Formattion</param>
-        public void Error(string message, string source = null, params object[] format) {
-            Log(message, LogLevel.Error, source ?? LogSource, format);
+        public void Error(string message, string source = null) {
+            Log(message, LogLevel.Error, source ?? LogSource);
         }
         /// <summary>
         /// Send Critical log to console stdout (if enabled) and file logger (if exists). Simular to: <see cref="Log(string, LogLevel, string, object[])"/> where <see cref="LogLevel"/> is <see cref="LogLevel.Critical"/>
         /// </summary>
         /// <param name="message">Message to send</param>
         /// <param name="source">Log source</param>
-        /// <param name="format">Formattion</param>
-        public void Critical(string message, string source = null, params object[] format) {
-            Log(message, LogLevel.Critical, source ?? LogSource, format);
+        public void Critical(string message, string source = null) {
+            Log(message, LogLevel.Critical, source ?? LogSource);
         }
         /// <summary>
         /// Send Fatal log to console stdout (if enabled) and file logger (if exists). Simular to: <see cref="Log(string, LogLevel, string, object[])"/> where <see cref="LogLevel"/> is <see cref="LogLevel.Fatal"/>
         /// </summary>
         /// <param name="message">Message to send</param>
         /// <param name="source">Log source</param>
-        /// <param name="format">Formattion</param>
-        public void Fatal(string message, string source = null, params object[] format) {
-            Log(message, LogLevel.Fatal, source ?? LogSource, format);
+        public void Fatal(string message, string source = null) {
+            Log(message, LogLevel.Fatal, source ?? LogSource);
         }
     }
 }
