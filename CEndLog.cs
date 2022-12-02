@@ -130,11 +130,11 @@ namespace DESCEnd.Logging {
             OnLog?.Invoke(level, message, source);
             var lvlString = level.ToString().ToUpper();
             var formatForConsole = new Dictionary<string, object> {
-                ["Source"] = source,
-                ["SourceThread"] = Thread.CurrentThread.Name,
+                ["Source"] = source??"Null",
+                ["SourceThread"] = Thread.CurrentThread.Name??"Null",
                 ["Date"] = DateTime.Now,
                 ["Level"] = lvlString + Enumerable.Repeat(" ", 8-lvlString.Length),
-                ["Message"] = message
+                ["Message"] = message??"*message isn't provided*"
             };
             var msg = LogMessageSchema.Format(formatForConsole);
             if (ConsoleLogging && level >= ConsoleLoggingLevel) {
